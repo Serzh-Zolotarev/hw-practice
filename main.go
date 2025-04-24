@@ -55,6 +55,8 @@ func main() {
 
 // Фильтрация отрицательных чисел и нулей
 func onlyUnsignedStage(done <-chan int, input <-chan int) (<-chan int, <-chan int) {
+	fmt.Println("filter only unsigned stage started")
+
 	unsignedStream := make(chan int)
 	go func() {
 		defer close(unsignedStream)
@@ -73,11 +75,16 @@ func onlyUnsignedStage(done <-chan int, input <-chan int) (<-chan int, <-chan in
 			}
 		}
 	}()
+
+	fmt.Println("filter only unsigned stage ended")
+
 	return done, unsignedStream
 }
 
 // Фильтрация чисел не кратных 3
 func buffNonMult3Stage(done <-chan int, input <-chan int) (<-chan int, <-chan int) {
+	fmt.Println("filter non mult 3 stage started")
+
 	mult3Stream := make(chan int)
 	go func() {
 		defer close(mult3Stream)
@@ -96,11 +103,16 @@ func buffNonMult3Stage(done <-chan int, input <-chan int) (<-chan int, <-chan in
 			}
 		}
 	}()
+
+	fmt.Println("filter non mult 3 stage ended")
+
 	return done, mult3Stream
 }
 
 // Буферизация
 func bufferStage(done <-chan int, input <-chan int) (<-chan int, <-chan int) {
+	fmt.Println("Buffer stage started")
+
 	bufferChan := make(chan int)
 	buffer := RingBuffer{make([]int, bufferSize), -1, bufferSize, sync.Mutex{}}
 
@@ -134,6 +146,9 @@ func bufferStage(done <-chan int, input <-chan int) (<-chan int, <-chan int) {
 			}
 		}
 	}()
+
+	fmt.Println("Buffer stage ended")
+
 	return done, bufferChan
 }
 
@@ -150,6 +165,8 @@ func printer(done <-chan int, c <-chan int) {
 }
 
 func scanConsole() (<-chan int, <-chan int) {
+	fmt.Println("scan console stage started")
+
 	c := make(chan int)
 	done := make(chan int)
 	go func() {
@@ -171,5 +188,8 @@ func scanConsole() (<-chan int, <-chan int) {
 			c <- i
 		}
 	}()
+
+	fmt.Println("scan console stage ended")
+
 	return done, c
 }
